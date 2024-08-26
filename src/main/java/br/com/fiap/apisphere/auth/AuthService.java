@@ -16,29 +16,26 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, TokenService tokenService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.tokenService = tokenService;
     }
 
-    public Token login (@RequestBody Credentials credentials) {
+    public Token login (Credentials credentials) {
         var user = userRepository.findByEmail(credentials.email())
             .orElseThrow( () -> new RuntimeException("Invalid Email"));
 
         if ( !passwordEncoder.matches(credentials.password(), user.getPassword()) )
             throw new RuntimeException("Invalid Password");
 
+        return tokenService.createToken(credentials);
 
-        Algorithm algorithm = Algorithm.HMAC256("assinatura");
-        var expiresAt = LocalDateTime.now().plusHours(1).toInstant(ZoneOffset.ofHours(-3));
-        String token = JWT.create()
-                .withSubject(credentials.email())
-                .withIssuer("Sphere")
-                .withExpiresAt(expiresAt)
-                .withClaim("role", "ADMIN")
-                .sign(algorithm);
 
-        return new Token(token, credentials.email());
+
+
+
     }
 }
