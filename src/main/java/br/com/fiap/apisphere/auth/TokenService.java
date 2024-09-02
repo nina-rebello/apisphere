@@ -14,18 +14,17 @@ import java.time.ZoneOffset;
 public class TokenService {
 
     private final UserRepository userRepository;
-    Algorithm algorithm = Algorithm.HMAC256("assinatura");
+    private Algorithm algorithm = Algorithm.HMAC256("assinatura");
 
     public TokenService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     public Token createToken(Credentials credentials) {
-
         var expiresAt = LocalDateTime.now().plusHours(1).toInstant(ZoneOffset.ofHours(-3));
         String token = JWT.create()
                 .withSubject(credentials.email())
-                .withIssuer("Sphere")
+                .withIssuer("sphere")
                 .withExpiresAt(expiresAt)
                 .withClaim("role", "ADMIN")
                 .sign(algorithm);
@@ -35,7 +34,7 @@ public class TokenService {
 
     public User getUserFromToken(String token) {
         var email = JWT.require(algorithm)
-                .withIssuer("Sphere")
+                .withIssuer("sphere")
                 .build()
                 .verify(token)
                 .getSubject();

@@ -22,11 +22,11 @@ public class SecurityConfig {
         );
         http.addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
-
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }
