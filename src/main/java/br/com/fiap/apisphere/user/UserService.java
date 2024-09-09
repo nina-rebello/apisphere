@@ -45,7 +45,7 @@ public class UserService {
         try(InputStream is = file.getInputStream()){
             Path destinationDir = Path.of("src/main/resources/static/avatars");
             Path destinationFile = destinationDir
-                    .resolve(email + file.getOriginalFilename() )
+                    .resolve(System.currentTimeMillis() + file.getOriginalFilename() )
                     .normalize()
                     .toAbsolutePath();
 
@@ -54,7 +54,7 @@ public class UserService {
             System.out.println("Arquivo salvo com sucesso");
 
             var user = repository.findByEmail(email).orElseThrow( () -> new UsernameNotFoundException("User not found"));
-            var avatarUrl = "http://localhost:8082/avatars/" + destinationFile.getFileName();
+            var avatarUrl = "http://localhost:8082/users/avatars/" + destinationFile.getFileName();
             user.setAvatar(avatarUrl);
             repository.save(user);
 
@@ -62,6 +62,9 @@ public class UserService {
             System.out.println("Erro ao copiar arquivo. " + e.getCause());
         }
 
+    }
 
+    public List<User> findByName(String name) {
+        return repository.findByNameContainingIgnoreCase(name);
     }
 }
