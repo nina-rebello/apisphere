@@ -1,5 +1,6 @@
 package br.com.fiap.apisphere.user;
 
+import br.com.fiap.apisphere.mail.MailService;
 import br.com.fiap.apisphere.user.dto.UserProfileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,6 +21,8 @@ public class UserService {
     UserRepository repository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private MailService mailService;
 
     public List<User> findAll(){
         return repository.findAll();
@@ -28,6 +31,7 @@ public class UserService {
     public User create(User user){
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setAvatar("https://avatar.iran.liara.run/username?username=" + user.getName());
+        mailService.sendWelcomeEmail(user);
         return repository.save(user);
     }
 
